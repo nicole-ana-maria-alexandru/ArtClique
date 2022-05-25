@@ -30,7 +30,6 @@ function Navbar() {
     await logout();
     setIsLoading(false);
   };
-  console.log(userDetails);
 
   return (
     <div>
@@ -46,7 +45,7 @@ function Navbar() {
         >
           <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
             <Text
-              textAlign={useBreakpointValue({ base: "center", md: "left" })}
+              // textAlign={useBreakpointValue({ base: "center", md: "left" })}
               fontFamily={"heading"}
               color={"white"}
             >

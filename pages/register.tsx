@@ -75,7 +75,7 @@ const Register: NextPage = () => {
     }
 
     setIsLoading(false);
-    router.push("/");
+    router.push("/profile");
   };
 
   return (
@@ -107,7 +107,7 @@ const Register: NextPage = () => {
                   <Input
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e:any) => setPassword(e.target.value)}
                     color={"white"}
                   />
                   <InputRightElement h={"full"}>
@@ -135,7 +135,7 @@ const Register: NextPage = () => {
                       color={"white"}
                       type="text"
                       value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      onChange={(e:any) => setFirstName(e.target.value)}
                     />
                   </FormControl>
                 </Box>
@@ -146,7 +146,7 @@ const Register: NextPage = () => {
                       color={"white"}
                       type="text"
                       value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                      onChange={(e:any) => setLastName(e.target.value)}
                     />
                   </FormControl>
                 </Box>
@@ -159,7 +159,7 @@ const Register: NextPage = () => {
                     color={"white"}
                     type="text"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e:any) => setUsername(e.target.value)}
                   />
                 </FormControl>
               </Box>

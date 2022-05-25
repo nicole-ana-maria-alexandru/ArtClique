@@ -48,7 +48,7 @@ const Login: NextPage = () => {
     }
 
     setIsLoading(false);
-    router.push("/");
+    router.push("/profile");
   };
 
   return (
@@ -89,7 +89,7 @@ const Login: NextPage = () => {
                   align={"start"}
                   justify={"space-between"}
                 >
-                  <Checkbox color={"white"} colorScheme="purple" isChecked={rememberUser} onChange={(e) => setRememberUser(e.target.checked)}>Remember me</Checkbox>
+                  <Checkbox color={"white"} colorScheme="purple" isChecked={rememberUser} onChange={(e:any) => setRememberUser(e.target.checked)}>Remember me</Checkbox>
                   <Link color={"purple.400"}>Forgot password?</Link>
                 </Stack>
                 <Stack>
