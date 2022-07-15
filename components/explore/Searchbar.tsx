@@ -33,6 +33,8 @@ import {
   where,
   collectionGroup,
 } from "firebase/firestore";
+
+import { useAuth } from "../../hooks/AuthContext";
 import router from "next/router";
 
 function Searchbar() {
@@ -40,46 +42,53 @@ function Searchbar() {
   const [users, setUsers] = useState<any>([]);
   const [result, setResult] = useState<any>([]);
   const [searched, setSearched] = useState<any>("");
+  const { userDetails } = useAuth();
 
   const handleModalClose = () => {
     setOpenModal(false);
   };
 
-  const redirect = (id : any) => {
-    router.push(`/profile/${id}`);
-  }
+  const redirect = (id: any) => {
+    if (userDetails?.id == id) {
+      router.push(`/yourProfile`);
+    } else router.push(`/profile/${id}`);
+  };
 
   useEffect(() => {
     const q = query(collection(db, "users"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       setUsers(querySnapshot.docs);
     });
-    console.log(users);
 
     return () => {
       unsubscribe();
     };
   }, []);
 
-  const onChangeHandler = (text : string) => {
+  const onChangeHandler = (text: string) => {
     setSearched(text);
-    if(text.length > 0 && text.trim()){
-    setResult(users.filter((user : any) => String(user.data().username).includes(text)));
-    }
-    else{
+    if (text.length > 0 && text.trim()) {
+      setResult(
+        users.filter((user: any) => String(user.data().username).includes(text))
+      );
+    } else {
       setResult([]);
     }
-  }
+  };
 
   return (
     <div>
       <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="open menu"
-          icon={<SearchIcon />}
-          onClick={() => setOpenModal(true)}
-        />
+        size="lg"
+        variant="ghost"
+        aria-label="open menu"
+        icon={<SearchIcon />}
+        onClick={() => setOpenModal(true)}
+        color="gray.100"
+        _hover={{
+          bgGradient: "linear(to-r, blue.500, purple.500)",
+        }}
+      />
 
       <Modal
         isOpen={openModal}
@@ -104,8 +113,13 @@ function Searchbar() {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {result.map((user : any) => (
-                <HStack pb={5} onClick={() => redirect(user.id)}>
+            {result.map((user: any) => (
+              <HStack
+                pb={5}
+                onClick={() => redirect(user.id)}
+                cursor={"pointer"}
+                key={user.id}
+              >
                 <Avatar size={"sm"} src={user.data().profile_img} />
                 <VStack
                   display={{ base: "none", md: "flex" }}

@@ -14,9 +14,10 @@ import {
 import { db } from "../hooks/firebase/firebase";
 import { useAuth } from "../hooks/AuthContext";
 
+
 const Profile: NextPage = () => {
   const [posts, setPosts] = useState<any>([]);
-  const { user, userDetails, artist, setUserDetails } = useAuth();
+  const { user, userDetails } = useAuth();
 
   // useEffect(
   //   () =>
@@ -50,7 +51,6 @@ const Profile: NextPage = () => {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         setPosts(querySnapshot.docs);
       });
-      console.log(posts);
 
       return () => {
         unsubscribe();
@@ -58,45 +58,15 @@ const Profile: NextPage = () => {
     }
   }, [db, userDetails?.id]);
 
-  console.log(posts);
-
-  //exemplu QUERY compus
-  // useEffect(() => {
-  //   if (userDetails) {
-  //     const q = query(
-  //       collection(db, "posts"),
-  //       where("userId", "==", userDetails?.id),
-  //       where("username", "==", userDetails?.username),
-  //       where("isForSale", "==", true),
-  //       orderBy("timestamp", "desc")
-  //     );
-  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //       setPosts(querySnapshot.docs);
-  //     });
-  //     console.log(posts);
-
-  //     return () => {
-  //       unsubscribe();
-  //     };
-  //   }
-  // }, [db, userDetails?.id]);
-
-  // console.log(posts);
-
-  // useEffect(() => {
-  //   const unsubscribe = onSnapshot(query(collection(db, 'posts'), where("userId", "==", userDetails.id), orderBy('timestamp', 'desc')), snapshot =>{
-  //     setPosts(snapshot.docs);
-  //   });
-
-  //   return unsubscribe();
-  // }, [db]);
-
   return (
     <div>
       <NavMenu>
+        {
+          userDetails && 
+          <UserProfileCard />
+        }
         {posts && (
-          <>
-            <UserProfileCard />
+          <>    
             {posts.map((post : any) => (
               <Post
                 key={post.id}
@@ -106,6 +76,8 @@ const Profile: NextPage = () => {
                 postImg={post.data().image}
                 caption={post.data().caption}
                 isForSale={post.data().isForSale}
+                userId={post.data().userId}
+                timestamp={post.data().timestamp}
               />
             ))}
           </>

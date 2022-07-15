@@ -3,7 +3,11 @@ export interface UserDetails {
   auth_uid: string;
   first_name: string;
   last_name: string;
-  user_type: string;
+  description: string;
   username: string;
   profile_img: string;
+  followers: string[];
+  following: string[];
+  tags: string[];
+  country: string;
 }

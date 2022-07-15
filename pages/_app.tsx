@@ -9,6 +9,7 @@ import "@fontsource/aileron/700.css";
 import { useRouter } from "next/router";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { RecoilRoot } from "recoil";
+import Head from "next/head";
 
 // const colors = {
 //   brand: {
@@ -44,6 +45,15 @@ const theme = extendTheme({
     white_btn: "0px 0px 5px white",
     multicolor: "1px 1px 15px purple, 0 0 50px darkblue, 0 0 15px blue",
   },
+  components: {
+    Checkbox: {
+      baseStyle: {
+        label: {
+          touchAction: "none",
+        },
+      },
+    },
+  },
 });
 
 const noAuthRequired = ["/", "/login", "/register"];
@@ -52,7 +62,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   return (
-    <RecoilRoot>
+    <>
+      <Head>
+        <script src="https://js.stripe.com/v3/"></script>
+      </Head>
+
       <ChakraProvider theme={theme}>
         <AuthContextProvider>
           {noAuthRequired.includes(router.pathname) ? (
@@ -64,7 +78,21 @@ function MyApp({ Component, pageProps }: AppProps) {
           )}
         </AuthContextProvider>
       </ChakraProvider>
-    </RecoilRoot>
+    </>
+
+    // <RecoilRoot>
+    //   <ChakraProvider theme={theme}>
+    //     <AuthContextProvider>
+    //       {noAuthRequired.includes(router.pathname) ? (
+    //         <Component {...pageProps} />
+    //       ) : (
+    //         <ProtectedRoute>
+    //           <Component {...pageProps} />
+    //         </ProtectedRoute>
+    //       )}
+    //     </AuthContextProvider>
+    //   </ChakraProvider>
+    // </RecoilRoot>
   );
 }
 

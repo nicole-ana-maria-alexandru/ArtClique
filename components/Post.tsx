@@ -27,6 +27,22 @@ import {
   PopoverTrigger,
   IconButton,
   usePopoverContext,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  HStack,
+  Checkbox,
+  CheckboxGroup,
+  FormControl,
+  FormLabel,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from "@chakra-ui/react";
 import { FaRegComment, FaRegHeart, FaHeart } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
@@ -42,8 +58,18 @@ import {
   doc,
   serverTimestamp,
   setDoc,
+  Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../hooks/firebase/firebase";
+import router from "next/router";
+import {
+  HamburgerIcon,
+  AddIcon,
+  ExternalLinkIcon,
+  RepeatIcon,
+  EditIcon,
+} from "@chakra-ui/icons";
 
 // function Post({ id, username, userImg, img, caption }: {id: string; username: string; userImg:string, img:string, caption:string}) {
 
@@ -54,6 +80,8 @@ function Post({
   postImg,
   caption,
   isForSale,
+  userId,
+  timestamp,
 }: {
   id: string;
   username: string;
@@ -61,6 +89,8 @@ function Post({
   postImg: string;
   caption: string;
   isForSale: boolean;
+  userId: string;
+  timestamp: Timestamp;
 }) {
   const { userDetails } = useAuth();
   const [comment, setComment] = useState("");
@@ -69,6 +99,34 @@ function Post({
   const [hasLiked, setHasLiked] = useState(false);
   const [hiddenComments, setHiddenComments] = useState(true);
   const [piece, setPiece] = useState<any>(null);
+  const [openModalEditTags, setOpenModalEditTags] = useState(false);
+  const [loadingTags, setLoadingTags] = useState(false);
+  var cbResults : any[] = [];
+
+  const styleValues = [
+    "Contemporary",
+    "Street Art",
+    "Pop Art",
+    "Realism",
+    "Abstract",
+    "Modernism",
+    "Expressionism",
+    "Impressionism",
+    "Post-war",
+    "Old Masters",
+  ];
+  const subjectValues = [
+    "Portrait",
+    "Landscape",
+    "Animals",
+    "Birds",
+    "History",
+    "Animation",
+    "Graffiti",
+    "Sport",
+    "Celebrities",
+    "Still life",
+  ];
 
   //integrare popover pe butonul de cart
   interface PopoverTriggerProps {
@@ -90,6 +148,10 @@ function Post({
 
   const initialFocusRef = useRef<HTMLButtonElement>(null);
 
+  const handleModalEditTagsClose = () => {
+    setOpenModalEditTags(false);
+  };
+
   //functie pt aducere piesa asociata
   useEffect(() => {
     const q = query(collection(db, "pieces"), where("postId", "==", id));
@@ -103,9 +165,17 @@ function Post({
           price: doc.data().price,
           title: doc.data().title,
           year: doc.data().year,
+          type: doc.data().type,
+          height: doc.data().height,
+          width: doc.data().width,
+          depth: doc.data().depth,
+          image: doc.data().image,
+          tags: doc.data().tags,
+          measurementUnit: doc.data().measurementUnit,
         });
       });
     });
+    cbResults = piece?.tags;
     return () => {
       unsubscribe();
     };
@@ -166,6 +236,37 @@ function Post({
     });
   };
 
+  const redirect = (id: any) => {
+    if (userDetails?.id == id) {
+      router.push(`/yourProfile`);
+    } else router.push(`/profile/${id}`);
+  };
+
+
+  const handleCbTagsOnChange = (e:any, value:any) => {
+    e.preventDefault();
+    if(e.target.checked)
+      cbResults.push(value)
+    else
+    {
+      if (cbResults.indexOf(value) > -1) {
+        cbResults.splice(cbResults.indexOf(value), 1);
+      }
+    }
+  };
+
+  const updateTags = async () => {
+    if (loadingTags) return;
+
+    setLoadingTags(true);
+    await updateDoc(doc(db, "pieces", piece?.id), {
+      tags: cbResults,
+    });
+
+    setOpenModalEditTags(false);
+    setLoadingTags(false);
+  };
+
   return (
     <div>
       <Center py={6}>
@@ -190,7 +291,13 @@ function Post({
                 }}
               />
               <Center>
-                <Text fontWeight={600} color={"black"} size="sm" mb={4}>
+                <Text
+                  fontWeight={600}
+                  color={"black"}
+                  size="sm"
+                  mb={4}
+                  cursor={"pointer"}
+                >
                   {username}
                 </Text>
               </Center>
@@ -214,9 +321,10 @@ function Post({
                   {/* <Icon as={FiShoppingCart} w={7} h={7} cursor="pointer"></Icon> */}
                 </PopoverTrigger>
                 <PopoverContent
-                  color="white"
-                  bg="gray.800"
-                  borderColor="blue.800"
+                  color="gray.100"
+                  // bg="gray.900"
+                  bgGradient="linear(to-b, #181820, #0b0b0f)"
+                  borderColor="gray.900"
                 >
                   <PopoverHeader pt={4} fontWeight="bold" border="0">
                     The piece is for sale
@@ -228,11 +336,31 @@ function Post({
                       <Center>
                         <Box fontSize="lg">{piece?.title}</Box>
                       </Center>
-                      <Box fontSize="md">{piece?.artistName}</Box>
-                      <Box fontSize="md">{piece?.year}</Box>
+                      <HStack>
+                        <Box fontSize="md">Name: </Box>
+                        <Box fontSize="md">{piece?.artistName}</Box>
+                      </HStack>
+                      <HStack>
+                        <Box fontSize="md">Year: </Box>
+                        <Box fontSize="md">{piece?.year}</Box>
+                      </HStack>
+                      <HStack>
+                        <Box fontSize="md">Type: </Box>
+                        <Box fontSize="md">{piece?.type}</Box>
+                      </HStack>
+                      <HStack>
+                        <Box fontSize="md">H,W,D: </Box>
+                        <Box fontSize="md">
+                          {piece?.height},{piece?.width},{piece?.depth}{" "}
+                          {piece?.measurementUnit}
+                        </Box>
+                      </HStack>
+
                       <Stack direction={"row"}>
-                        <Box fontSize="md">{piece?.price}</Box>
-                        <Box fontSize="md">{piece?.currency}</Box>
+                        <Box fontSize="md">Price: </Box>
+                        <Box fontSize="md">
+                          {piece?.price} {piece?.currency}
+                        </Box>
                       </Stack>
                     </Stack>
                   </PopoverBody>
@@ -244,22 +372,94 @@ function Post({
                     pb={4}
                   >
                     <Center>
-                      {piece?.isAvailable ? (
-                        <Button
-                          colorScheme="blue"
-                          variant={"outline"}
-                          width="100px"
-                          ref={initialFocusRef}
-                        >
-                          Buy
-                        </Button>
+                      {userDetails?.id === userId ? (
+                        <>
+                          <Menu isLazy>
+                            <MenuButton
+                              aria-label="Options"
+                              transition="all 0.2s"
+                            >
+                              Edit
+                            </MenuButton>
+                            <MenuList
+                              bgGradient="linear(to-b, #181820, #0b0b0f)"
+                              _hover={{
+                                bgGradient:
+                                  "linear(to-r, blue.500, purple.500)",
+                                // bg: "charcoal.50"
+                              }}
+                            >
+                              <MenuItem
+                                icon={<EditIcon />}
+                                _focus={{
+                                  bgGradient:
+                                    "linear(to-r, blue.500, purple.500)",
+                                }}
+                                onClick={() => setOpenModalEditTags(true)}
+                              >
+                                Edit tags
+                              </MenuItem>
+                              {/* <MenuItem
+                                icon={<ExternalLinkIcon />}
+                                command="⌘N"
+                              >
+                                New Window
+                              </MenuItem>
+                              <MenuItem icon={<RepeatIcon />} command="⌘⇧N">
+                                Open Closed Tab
+                              </MenuItem>
+                              <MenuItem icon={<EditIcon />} command="⌘O">
+                                Open File...
+                              </MenuItem> */}
+                            </MenuList>
+                          </Menu>
+                        </>
                       ) : (
-                        <Box>The piece was sold</Box>
+                        <>
+                          {piece?.isAvailable ? (
+                            <Button
+                              bgGradient="linear(to-r, blue.500, purple.500)"
+                              width="100px"
+                              _hover={{
+                                bgGradient:
+                                  "linear(to-r, blue.400, purple.400)",
+                                shadow: "white_btn",
+                              }}
+                              ref={initialFocusRef}
+                              onClick={() =>
+                                router.push(`/placeOrder/${piece?.id}`)
+                              }
+                            >
+                              Buy
+                            </Button>
+                          ) : (
+                            <Box>The piece is no longer available</Box>
+                          )}
+                        </>
                       )}
                     </Center>
                   </PopoverFooter>
                 </PopoverContent>
               </Popover>
+            )}
+
+            {userDetails?.id === userId && (
+              <Menu isLazy>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="Options"
+                  icon={<HamburgerIcon />}
+                  variant="floating"
+                />
+                <MenuList>
+                  <MenuItem icon={<AddIcon />} command="⌘T">
+                    Delete post
+                  </MenuItem>
+                  <MenuItem icon={<ExternalLinkIcon />} command="⌘N">
+                    Edit post
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             )}
           </Flex>
           <Box
@@ -336,6 +536,7 @@ function Post({
                 {caption}
               </Text>
             </Stack>
+            <Moment fromNow>{timestamp?.toDate()}</Moment>
             {!hiddenComments && (
               <>
                 <Divider />
@@ -359,32 +560,40 @@ function Post({
                       >
                         {comments.map((comment: any) => (
                           <div key={comment.id}>
-                            <Stack direction={"row"}>
-                              <Stack
-                                direction={"row"}
-                                justifyContent={"flex-end"}
-                              >
-                                <Avatar
-                                  size={"sm"}
-                                  src={comment.data().userImage}
-                                  css={{
-                                    border: "2px solid white",
-                                  }}
-                                />
-                                <Text
-                                  fontSize={"lg"}
-                                  fontFamily={"body"}
-                                  fontWeight={"bold"}
+                            <Stack
+                              direction={"row"}
+                              justifyContent={"justify-end"}
+                            >
+                              <Flex>
+                                <Stack
+                                  direction={"row"}
+                                  justifyContent={"space-between"}
                                 >
-                                  {comment.data().username}
-                                </Text>
-                                <Text fontSize={"lg"} fontFamily={"body"}>
-                                  {comment.data().comment}
-                                </Text>
-                              </Stack>
-                              <Moment fromNow>
+                                  <Avatar
+                                    size={"sm"}
+                                    src={comment.data().userImage}
+                                    css={{
+                                      border: "2px solid white",
+                                    }}
+                                  />
+                                  <Text
+                                    fontSize={"lg"}
+                                    fontFamily={"body"}
+                                    fontWeight={"bold"}
+                                  >
+                                    {comment.data().username}
+                                  </Text>
+                                  <Text fontSize={"lg"} fontFamily={"body"}>
+                                    {comment.data().comment}
+                                  </Text>
+                                </Stack>
+
+                                <Spacer />
+
+                                {/* <Moment fromNow>
                                 {comment.data().timestamp?.toDate()}
-                              </Moment>
+                              </Moment> */}
+                              </Flex>
                             </Stack>
                           </div>
                         ))}
@@ -412,6 +621,66 @@ function Post({
             )}
           </Stack>
         </Box>
+
+        <Modal
+              isOpen={openModalEditTags}
+              onClose={handleModalEditTagsClose}
+            >
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Edit your piece's tags</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody pb={6}>
+                  <FormControl pb={6}>
+                    <FormLabel fontWeight={700} fontSize={"lg"}>
+                      Subject
+                    </FormLabel>
+                    <Box overflowY={"scroll"} height={"150px"} pl={4}>
+                      <CheckboxGroup
+                        colorScheme="purple"
+                        defaultValue={piece?.tags}
+                      >
+                        <Stack spacing={[1, 5]} direction={"column"}>
+                          {subjectValues.map((value: any) => (
+                            <Checkbox key={value} value={value} 
+                            onChange={(e:any) => handleCbTagsOnChange(e, value)}
+                            >{value}</Checkbox>
+                          ))}
+                        </Stack>
+                      </CheckboxGroup>
+                    </Box>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel fontWeight={700} fontSize={"lg"}>
+                      Style
+                    </FormLabel>
+                    <Box overflowY={"scroll"} height={"150px"} pl={4}>
+                      <CheckboxGroup colorScheme="purple" defaultValue={piece?.tags}>
+                        <Stack spacing={[1, 5]} direction={"column"}>
+                          {styleValues.map((value: any) => (
+                            <Checkbox key={value} value={value} onChange={(e:any) => handleCbTagsOnChange(e, value)}>{value}</Checkbox>
+                          ))}
+                        </Stack>
+                      </CheckboxGroup>
+                    </Box>
+                  </FormControl>
+                </ModalBody>
+
+                <ModalFooter>
+                  <Button
+                    colorScheme="blue"
+                    mr={3}
+                    onClick={updateTags}
+                  >
+                    {loadingTags ? "Saving..." : "Save changes"}
+                  </Button>
+                  <Button onClick={handleModalEditTagsClose}>Cancel</Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+
+
       </Center>
     </div>
   );

@@ -9,7 +9,7 @@ interface Props {
 export const useInput = ({ type }: Props) => {
   const [value, setValue] = useState('')
   const input = (
-    <Input value={value} onChange={(e) => setValue(e.target.value)} type={type} color={"white"}/>
+    <Input value={value} onChange={(e : any) => setValue(e.target.value)} type={type} color={"white"}/>
   )
   return [value, input]
 }

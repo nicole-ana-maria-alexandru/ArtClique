@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAuth } from "../hooks/AuthContext";
+import Image from 'next/image';
 
 function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
@@ -42,17 +43,22 @@ function Navbar() {
           borderStyle={"solid"}
           borderColor={"gray.700"}
           align={"center"}
+          height="20"
         >
           <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-            <Text
+            {/* <Text
               // textAlign={useBreakpointValue({ base: "center", md: "left" })}
               fontFamily={"heading"}
               color={"white"}
             >
               The Gallery Shop
-            </Text>
+            </Text> */}
+            <Box mx='8'>
+      <Image unoptimized={true} src={require('./assets/logo.gif')} alt="logo" />
+      </Box>
 
-            <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
+
+
           </Flex>
 
           <Stack

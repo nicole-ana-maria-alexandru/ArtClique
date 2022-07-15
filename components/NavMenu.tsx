@@ -22,6 +22,7 @@ import {
   MenuItem,
   MenuList,
   Button,
+  Center,
 } from "@chakra-ui/react";
 import {
   FiHome,
@@ -32,23 +33,33 @@ import {
   FiMenu,
   FiBell,
   FiChevronDown,
+  FiMessageCircle,
+  FiUser,
+  FiArchive,
+  FiUsers,
 } from "react-icons/fi";
 import { IconType } from "react-icons";
 import { ReactText, useState } from "react";
 import { useAuth } from "../hooks/AuthContext";
 import { useRouter } from "next/router";
 import Searchbar from "./explore/Searchbar";
+import logo from "./assets/logo.gif";
+import Image from "next/image";
 
 interface LinkItemProps {
   name: string;
   icon: IconType;
+  route: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Home", icon: FiHome },
-  { name: "Trending", icon: FiTrendingUp },
-  { name: "Explore", icon: FiCompass },
-  { name: "Favourites", icon: FiStar },
-  { name: "Settings", icon: FiSettings },
+  { name: "News Feed", icon: FiHome, route: "/newsFeed" },
+  { name: "My Profile", icon: FiUser, route: "/yourProfile" },
+  { name: "Messaging", icon: FiMessageCircle, route: "/messaging" },
+  { name: "Favourites", icon: FiStar, route: "/newsFeed" },
+  { name: "Explore", icon: FiCompass, route: "/explore" },
+  { name: "Followers list", icon: FiUsers, route: "/followers" },
+  { name: "Following list", icon: FiUsers, route: "/following" },
+  { name: "Order History", icon: FiArchive, route: "/orderHistory" },
 ];
 
 export default function SidebarWithHeader({
@@ -62,6 +73,8 @@ export default function SidebarWithHeader({
       <SidebarContent
         onClose={() => onClose}
         display={{ base: "none", md: "block" }}
+        bgGradient="linear(to-b, #181820, #0b0b0f)"
+        color={"gray.100"}
       />
       <Drawer
         autoFocus={false}
@@ -72,7 +85,10 @@ export default function SidebarWithHeader({
         onOverlayClick={onClose}
         size="sm"
       >
-        <DrawerContent>
+        <DrawerContent
+          color={"gray.100"}
+          bgGradient="linear(to-b, #181820, #0b0b0f)"
+        >
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
@@ -93,22 +109,27 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Box
       transition="3s ease"
-      bg={useColorModeValue("white", "gray.900")}
+      //bg={useColorModeValue("white", "gray.900")}
+      bgGradient="linear(to-b, #181820, #0b0b0f)"
       borderRight="1px"
-      borderRightColor={useColorModeValue("gray.200", "gray.700")}
+      borderRightColor={"gray.900"}
       w={{ base: "full", md: 60 }}
       pos="fixed"
       h="full"
       {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
-        </Text>
+      <Flex h="20" alignItems="center" justifyContent="space-between">
+        <Box mx={{ base: 24, md: 8 }}>
+          <Image
+            unoptimized={true}
+            src={require("./assets/logo.gif")}
+            alt="logo"
+          />
+        </Box>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} route={link.route}>
           {link.name}
         </NavItem>
       ))}
@@ -118,12 +139,13 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 
 interface NavItemProps extends FlexProps {
   icon: IconType;
+  route: string;
   children: ReactText;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, route, children, ...rest }: NavItemProps) => {
   return (
     <Link
-      href="#"
+      href={route}
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
     >
@@ -135,7 +157,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: "cyan.400",
+          bgGradient: "linear(to-r, blue.500, purple.500)",
           color: "white",
         }}
         {...rest}
@@ -178,7 +200,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       px={{ base: 4, md: 4 }}
       height="20"
       alignItems="center"
-      bg={useColorModeValue("white", "gray.900")}
+      //bg={useColorModeValue("white", "gray.900")}
+      bgGradient="linear(to-r, #181820, #0b0b0f)"
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue("gray.200", "gray.700")}
       justifyContent={{ base: "space-between", md: "flex-end" }}
@@ -190,16 +213,30 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         variant="outline"
         aria-label="open menu"
         icon={<FiMenu />}
+        mr="5"
+        color={"gray.100"}
       />
 
-      <Text
+      <Box
+        display={{ base: "flex", sm: "flex", md: "none" }}
+        width={["50%", "25%", "15%"]}
+      >
+        <Image
+          unoptimized={true}
+          src={require("./assets/logo.gif")}
+          alt="logo"
+          objectFit="contain"
+        />
+      </Box>
+
+      {/* <Text
         display={{ base: "flex", md: "none" }}
         fontSize="2xl"
         fontFamily="monospace"
         fontWeight="bold"
       >
-        Logo
-      </Text>
+        asta e?
+      </Text> */}
 
       <HStack spacing={{ base: "0", md: "6" }}>
         <Searchbar></Searchbar>
@@ -211,21 +248,26 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               _focus={{ boxShadow: "none" }}
             >
               <HStack>
-                <Avatar size={"sm"} src={userDetails?.profile_img} />
+                <Avatar
+                  size={"sm"}
+                  src={userDetails?.profile_img}
+                  shadow={"xl"}
+                />
                 <VStack
                   display={{ base: "none", md: "flex" }}
                   alignItems="flex-start"
                   spacing="1px"
                   ml="2"
+                  color={"gray.100"}
                 >
                   <Text fontSize="sm">
                     {userDetails?.first_name} {userDetails?.last_name}
                   </Text>
-                  <Text fontSize="xs" color="gray.600">
+                  <Text fontSize="xs" color="gray.400">
                     @{userDetails?.username}
                   </Text>
                 </VStack>
-                <Box display={{ base: "none", md: "flex" }}>
+                <Box display={{ base: "none", md: "flex" }} color={"gray.100"}>
                   <FiChevronDown />
                 </Box>
               </HStack>
@@ -234,17 +276,13 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue("white", "gray.900")}
               borderColor={useColorModeValue("gray.200", "gray.700")}
             >
-              <MenuItem onClick={() => router.push('/yourProfile')}>Profile</MenuItem>
+              <MenuItem onClick={() => router.push("/yourProfile")}>
+                Profile
+              </MenuItem>
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              {user && 
-                <MenuItem
-                onClick = {onLogOut}
-                >
-                  Log out
-                </MenuItem>
-              }
+              {user && <MenuItem onClick={onLogOut}>Log out</MenuItem>}
             </MenuList>
           </Menu>
         </Flex>

@@ -48,7 +48,7 @@ const Login: NextPage = () => {
     }
 
     setIsLoading(false);
-    router.push("/profile");
+    router.push("/newsFeed");
   };
 
   return (

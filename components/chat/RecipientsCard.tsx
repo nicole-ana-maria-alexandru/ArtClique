@@ -19,26 +19,25 @@ import {
 } from "firebase/firestore";
 import { db } from "../../hooks/firebase/firebase";
 
-function TopbarChat({ username }: { username: any }) {
+function RecipientsCard({ userId }: { userId: any }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    if (username) {
-      const q = query(
-        collection(db, "users"),
-        where("username", "==", username)
-      );
+    if (userId) {
+      const q = query(collection(db, "users"), where("id", "==", userId));
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         querySnapshot.forEach((doc) => {
           setFirstName(doc.data().first_name);
           setLastName(doc.data().last_name);
           setProfileImage(doc.data().profile_img);
+          setUsername(doc.data().username);
         });
       });
     }
-  }, [db, username]);
+  }, [db, userId]);
 
   return (
     <div>
@@ -56,4 +55,4 @@ function TopbarChat({ username }: { username: any }) {
   );
 }
 
-export default TopbarChat;
+export default RecipientsCard;

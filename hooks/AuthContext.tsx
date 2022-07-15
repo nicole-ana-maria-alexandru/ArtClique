@@ -27,7 +27,7 @@ export const AuthContextProvider = ({
 }) => {
   const [user, setUser] = useState<any>(null);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [artist, setArtist] = useState<any>(null);
+  // const [artist, setArtist] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const getUserDetails = async (uid: string) => {
@@ -39,13 +39,17 @@ export const AuthContextProvider = ({
           auth_uid: doc.data().auth_uid,
           first_name: doc.data().first_name,
           last_name: doc.data().last_name,
-          user_type: doc.data().user_type,
+          description: doc.data().description,
           username: doc.data().username,
           profile_img: doc.data().profile_img,
+          followers: doc.data().followers,
+          following: doc.data().following,
+          tags: doc.data().tags,
+          country: doc.data().country,
         });
-        if(doc.data().user_type === "artist"){
-          getArtist(doc.id);
-        }
+        // if(doc.data().user_type === "artist"){
+        //   getArtist(doc.id);
+        // }
       });
     });
    return () => {
@@ -64,26 +68,26 @@ export const AuthContextProvider = ({
     // });
   };
 
-  const getArtist = async (id: string) => {
-    const q = query(collection(db, "artists"), where("user_id", "==", id));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        setArtist({
-          id: doc.id,
-          user_id: doc.data().user_id,
-          description: doc.data().description,
-        });
-      });
-    });
-    // const querySnapshot = await getDocs(q);
-    // querySnapshot.forEach((doc) => {
-    //   setArtist({
-    //     id: doc.id,
-    //     user_id: doc.data().user_id,
-    //     description: doc.data().description,
-    //   });
+  // const getArtist = async (id: string) => {
+  //   const q = query(collection(db, "artists"), where("user_id", "==", id));
+  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //     querySnapshot.forEach((doc) => {
+  //       setArtist({
+  //         id: doc.id,
+  //         user_id: doc.data().user_id,
+  //         description: doc.data().description,
+  //       });
+  //     });
+  //   });
+  //   // const querySnapshot = await getDocs(q);
+  //   // querySnapshot.forEach((doc) => {
+  //   //   setArtist({
+  //   //     id: doc.id,
+  //   //     user_id: doc.data().user_id,
+  //   //     description: doc.data().description,
+  //   //   });
 
-  };
+  // };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -99,7 +103,6 @@ export const AuthContextProvider = ({
       } else {
         setUser(null);
         setUserDetails(null);
-        setArtist(null);
       }
       setLoading(false);
     });
@@ -128,7 +131,6 @@ export const AuthContextProvider = ({
         register,
         logout,
         userDetails,
-        artist,
         setUserDetails,
       }}
     >
