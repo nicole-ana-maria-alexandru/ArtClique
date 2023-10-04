@@ -55,7 +55,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "News Feed", icon: FiHome, route: "/newsFeed" },
   { name: "My Profile", icon: FiUser, route: "/yourProfile" },
   { name: "Messaging", icon: FiMessageCircle, route: "/messaging" },
-  { name: "Favourites", icon: FiStar, route: "/newsFeed" },
+  // { name: "Favourites", icon: FiStar, route: "/newsFeed" },
   { name: "Explore", icon: FiCompass, route: "/explore" },
   { name: "Followers list", icon: FiUsers, route: "/followers" },
   { name: "Following list", icon: FiUsers, route: "/following" },
@@ -277,12 +277,10 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               borderColor={useColorModeValue("gray.200", "gray.700")}
             >
               <MenuItem onClick={() => router.push("/yourProfile")}>
-                Profile
+                My Profile
               </MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              {user && <MenuItem onClick={onLogOut}>Log out</MenuItem>}
+              {user && <MenuItem onClick={onLogOut} fontWeight={'bold'}>Log out</MenuItem>}
             </MenuList>
           </Menu>
         </Flex>

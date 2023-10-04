@@ -16,6 +16,7 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
+import OrderHistoryCard from "../components/OrderHistoryCard";
 
 const OrderHistory: NextPage = () => {
   const { userDetails } = useAuth();
@@ -75,28 +76,67 @@ const OrderHistory: NextPage = () => {
 
   return (
     <NavMenu>
-      <Tabs
-        isFitted
-        variant="soft-rounded"
-        onChange={(index: any) => setTabIndex(index)}
-      >
-        <TabList mb="1em">
-          <Tab
-            _selected={{ color: "gray.100", bg: "blue.500" }}
-            bg={"blue.200"}
-            color={"gray.500"}
-          >
-            Placed Orders
-          </Tab>
-          <Tab
-            _selected={{ color: "gray.100", bg: "purple.500" }}
-            bg={"purple.200"}
-            color={"gray.500"}
-          >
-            Recieved Orders
-          </Tab>
-        </TabList>
-      </Tabs>
+      <Box>
+        <Tabs
+          isFitted
+          variant="soft-rounded"
+          onChange={(index: any) => setTabIndex(index)}
+          cursor={"pointer"}
+        >
+          <TabList mb="1em">
+            <Tab
+              _selected={{ color: "gray.100", bg: "blue.500" }}
+              bg={"blue.200"}
+              color={"gray.500"}
+            >
+              Placed Orders
+            </Tab>
+            <Tab
+              _selected={{ color: "gray.100", bg: "purple.500" }}
+              bg={"purple.200"}
+              color={"gray.500"}
+            >
+              Recieved Orders
+            </Tab>
+          </TabList>
+        </Tabs>
+
+        {tabIndex === 0 && (
+          <>
+            {placedOrders.map((order: any) => (
+              <Box key={order.id}>
+                <OrderHistoryCard
+                  key={order.id}
+                  id={order.id}
+                  status={order.status}
+                  country={order.country}
+                  paymentMethod={order.paymentMethod}
+                  totalCost={order.totalCost}
+                  timestamp={order.timestamp}
+                ></OrderHistoryCard>
+              </Box>
+            ))}
+          </>
+        )}
+
+        {tabIndex === 1 && (
+          <>
+            {recievedOrders.map((order: any) => (
+              <Box key={order.id}>
+                <OrderHistoryCard
+                  key={order.id}
+                  id={order.id}
+                  status={order.status}
+                  country={order.country}
+                  paymentMethod={order.paymentMethod}
+                  totalCost={order.totalCost}
+                  timestamp={order.timestamp}
+                ></OrderHistoryCard>
+              </Box>
+            ))}
+          </>
+        )}
+      </Box>
     </NavMenu>
   );
 };

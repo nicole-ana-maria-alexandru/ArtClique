@@ -115,7 +115,11 @@ export const AuthContextProvider = ({
   };
 
   const login = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
+    try {
+      return signInWithEmailAndPassword(auth, email, password);
+    } catch (error : any) {
+      alert(error.message);
+    }
   };
 
   const logout = async () => {

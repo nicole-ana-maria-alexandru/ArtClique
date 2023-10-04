@@ -534,6 +534,23 @@ const Explore: NextPage = () => {
     setOpenDrawerPiece(false);
   };
 
+  const resetPieceFilters = () => {
+    setPieces(resetPieces);
+    setFiltersStyle([]);
+    setFiltersSubject([]);
+    setFiltersType([]);
+    setFilterArtistName(null);
+    setFilterPieceTitle(null);
+    setFilterAvailability(false);
+    setMeasurementUnit(null);
+    setSliderPriceValue([200, 250]);
+    setFilterPrice(false);
+    setPieceOrderCriterion(null);
+    setPieceOrder(null);
+    setPieceResultsFound(true);
+    setOpenDrawerPiece(false);
+  };
+
   return (
     <NavMenu>
       <Tabs
@@ -597,6 +614,7 @@ const Explore: NextPage = () => {
             <SimpleGrid columns={[1, 2, 3, 4]} spacing={5}>
               {profiles.map((profile: any) => (
                 <Box
+                  key={profile.id}
                   onClick={() => router.push(`/profile/${profile.id}`)}
                   cursor={"pointer"}
                 >
@@ -630,7 +648,7 @@ const Explore: NextPage = () => {
           ) : (
             <SimpleGrid columns={[1, 2, 3, 4]} spacing={5}>
               {pieces.map((piece: any) => (
-                <Box>
+                <Box key={piece.id}>
                   <PieceExploreCard
                     key={piece.id}
                     id={piece.id}
@@ -1056,6 +1074,9 @@ const Explore: NextPage = () => {
           </DrawerBody>
 
           <DrawerFooter borderTopWidth="1px">
+          <Button variant={"outline"} mr={4} onClick={resetPieceFilters}>
+              Reset filters
+            </Button>
             <Button colorScheme="blue" onClick={applyPieceFilters}>
               Apply filters
             </Button>

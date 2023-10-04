@@ -126,6 +126,8 @@ export default function Profile() {
       sender: userDetails.id,
       reciever: piece?.ownerId,
       status: "processing",
+      checkoutSessionId: "",
+      paymentStatus: "",
       timestamp: serverTimestamp(),
     });
 
@@ -240,10 +242,13 @@ export default function Profile() {
                 <FormControl id="phoneNumber" isRequired>
                   <FormLabel>Phone Number</FormLabel>
                   <InputGroup>
-                    <InputLeftElement
+                    {/* <InputLeftElement
                       pointerEvents="none"
                       children={<PhoneIcon color="gray.300" />}
-                    />
+                    /> */}
+                    <InputLeftElement pointerEvents="none">
+                      <PhoneIcon color="gray.300" />
+                    </InputLeftElement>
                     <Input
                       type="number"
                       placeholder="Phone number"

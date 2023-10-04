@@ -132,7 +132,7 @@ function SidebarChat() {
         //   <Text>@{getOtherUsername(chat.users, userDetails?.username)}</Text>
         // </Flex>
 
-        <div onClick={() => redirect(chat.id)}>
+        <div key={chat.id} onClick={() => redirect(chat.id)}>
           <RecipientsCard
             key={chat.id}
             // @ts-ignore
@@ -242,10 +242,13 @@ function SidebarChat() {
               />
             </FormControl> */}
             <InputGroup>
-              <InputLeftElement
+              {/* <InputLeftElement
                 pointerEvents="none"
                 children={<SearchIcon />}
-              />
+              /> */}
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon />
+              </InputLeftElement>
               <Input
                 type="text"
                 placeholder="Search users by username"

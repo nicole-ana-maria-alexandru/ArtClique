@@ -43,9 +43,17 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Tooltip,
+  AlertDialogOverlay,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  Switch,
 } from "@chakra-ui/react";
 import { FaRegComment, FaRegHeart, FaHeart } from "react-icons/fa";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiShoppingCart, FiTrash2 } from "react-icons/fi";
 import Moment from "react-moment";
 import {
   onSnapshot,
@@ -63,13 +71,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../hooks/firebase/firebase";
 import router from "next/router";
-import {
-  HamburgerIcon,
-  AddIcon,
-  ExternalLinkIcon,
-  RepeatIcon,
-  EditIcon,
-} from "@chakra-ui/icons";
+import { HamburgerIcon, AddIcon, RepeatIcon, EditIcon } from "@chakra-ui/icons";
 
 // function Post({ id, username, userImg, img, caption }: {id: string; username: string; userImg:string, img:string, caption:string}) {
 
@@ -100,8 +102,14 @@ function Post({
   const [hiddenComments, setHiddenComments] = useState(true);
   const [piece, setPiece] = useState<any>(null);
   const [openModalEditTags, setOpenModalEditTags] = useState(false);
+  const [openModalEditAvailability, setOpenModalEditAvailability] = useState(false);
+  const [openAlertDialogDelete, setOpenAlertDialogDelete] = useState(false);
   const [loadingTags, setLoadingTags] = useState(false);
-  var cbResults : any[] = [];
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [availability, setAvailability] = useState(false);
+  const cancelDeleteRef = useRef<any>(null);
+  const switchAvailabilityRef = useRef<any>(null);
+  var cbResults: any[] = [];
 
   const styleValues = [
     "Contemporary",
@@ -152,6 +160,14 @@ function Post({
     setOpenModalEditTags(false);
   };
 
+  const handleModalEditAvailabilityClose = () => {
+    setOpenModalEditAvailability(false);
+  };
+
+  const handleAlertDialogDeleteClose = () => {
+    setOpenAlertDialogDelete(false);
+  };
+
   //functie pt aducere piesa asociata
   useEffect(() => {
     const q = query(collection(db, "pieces"), where("postId", "==", id));
@@ -173,6 +189,7 @@ function Post({
           tags: doc.data().tags,
           measurementUnit: doc.data().measurementUnit,
         });
+        setAvailability(doc.data().isAvailable);
       });
     });
     cbResults = piece?.tags;
@@ -242,13 +259,10 @@ function Post({
     } else router.push(`/profile/${id}`);
   };
 
-
-  const handleCbTagsOnChange = (e:any, value:any) => {
+  const handleCbTagsOnChange = (e: any, value: any) => {
     e.preventDefault();
-    if(e.target.checked)
-      cbResults.push(value)
-    else
-    {
+    if (e.target.checked) cbResults.push(value);
+    else {
       if (cbResults.indexOf(value) > -1) {
         cbResults.splice(cbResults.indexOf(value), 1);
       }
@@ -265,6 +279,32 @@ function Post({
 
     setOpenModalEditTags(false);
     setLoadingTags(false);
+  };
+
+  const updateAvailability = async () => {
+    if (loadingAvailability) return;
+    if (availability === piece?.isAvailable){
+      setOpenModalEditAvailability(false);
+      return;
+    }
+    setLoadingAvailability(true);
+    await updateDoc(doc(db, "pieces", piece?.id), {
+      isAvailable: switchAvailabilityRef.current?.checked,
+    });
+
+    setOpenModalEditAvailability(false);
+    setLoadingAvailability(false);
+  };
+
+  const deletePost = async () => {
+    if (isForSale && piece) {
+      await deleteDoc(doc(db, "pieces", piece.id));
+      await deleteDoc(doc(db, "posts", id));
+      handleAlertDialogDeleteClose();
+    } else {
+      await deleteDoc(doc(db, "posts", id));
+      handleAlertDialogDeleteClose();
+    }
   };
 
   return (
@@ -381,17 +421,30 @@ function Post({
                             >
                               Edit
                             </MenuButton>
-                            <MenuList
-                              bgGradient="linear(to-b, #181820, #0b0b0f)"
-                              _hover={{
-                                bgGradient:
-                                  "linear(to-r, blue.500, purple.500)",
-                                // bg: "charcoal.50"
-                              }}
-                            >
+                            <MenuList bgGradient="linear(to-b, #181820, #0b0b0f)">
                               <MenuItem
                                 icon={<EditIcon />}
                                 _focus={{
+                                  bgGradient:
+                                    "linear(to-r, blue.500, purple.500)",
+                                }}
+                                _hover={{
+                                  bgGradient:
+                                    "linear(to-r, blue.500, purple.500)",
+                                }}
+                                onClick={() =>
+                                  setOpenModalEditAvailability(true)
+                                }
+                              >
+                                Edit piece availability
+                              </MenuItem>
+                              <MenuItem
+                                icon={<EditIcon />}
+                                _focus={{
+                                  bgGradient:
+                                    "linear(to-r, blue.500, purple.500)",
+                                }}
+                                _hover={{
                                   bgGradient:
                                     "linear(to-r, blue.500, purple.500)",
                                 }}
@@ -452,11 +505,11 @@ function Post({
                   variant="floating"
                 />
                 <MenuList>
-                  <MenuItem icon={<AddIcon />} command="⌘T">
+                  <MenuItem
+                    icon={<FiTrash2 />}
+                    onClick={() => setOpenAlertDialogDelete(true)}
+                  >
                     Delete post
-                  </MenuItem>
-                  <MenuItem icon={<ExternalLinkIcon />} command="⌘N">
-                    Edit post
                   </MenuItem>
                 </MenuList>
               </Menu>
@@ -622,65 +675,132 @@ function Post({
           </Stack>
         </Box>
 
-        <Modal
-              isOpen={openModalEditTags}
-              onClose={handleModalEditTagsClose}
-            >
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>Edit your piece's tags</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody pb={6}>
-                  <FormControl pb={6}>
-                    <FormLabel fontWeight={700} fontSize={"lg"}>
-                      Subject
-                    </FormLabel>
-                    <Box overflowY={"scroll"} height={"150px"} pl={4}>
-                      <CheckboxGroup
-                        colorScheme="purple"
-                        defaultValue={piece?.tags}
-                      >
-                        <Stack spacing={[1, 5]} direction={"column"}>
-                          {subjectValues.map((value: any) => (
-                            <Checkbox key={value} value={value} 
-                            onChange={(e:any) => handleCbTagsOnChange(e, value)}
-                            >{value}</Checkbox>
-                          ))}
-                        </Stack>
-                      </CheckboxGroup>
-                    </Box>
-                  </FormControl>
-
-                  <FormControl>
-                    <FormLabel fontWeight={700} fontSize={"lg"}>
-                      Style
-                    </FormLabel>
-                    <Box overflowY={"scroll"} height={"150px"} pl={4}>
-                      <CheckboxGroup colorScheme="purple" defaultValue={piece?.tags}>
-                        <Stack spacing={[1, 5]} direction={"column"}>
-                          {styleValues.map((value: any) => (
-                            <Checkbox key={value} value={value} onChange={(e:any) => handleCbTagsOnChange(e, value)}>{value}</Checkbox>
-                          ))}
-                        </Stack>
-                      </CheckboxGroup>
-                    </Box>
-                  </FormControl>
-                </ModalBody>
-
-                <ModalFooter>
-                  <Button
-                    colorScheme="blue"
-                    mr={3}
-                    onClick={updateTags}
+        <Modal isOpen={openModalEditTags} onClose={handleModalEditTagsClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Edit your piece&apos;s tags</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <FormControl pb={6}>
+                <FormLabel fontWeight={700} fontSize={"lg"}>
+                  Subject
+                </FormLabel>
+                <Box overflowY={"scroll"} height={"150px"} pl={4}>
+                  <CheckboxGroup
+                    colorScheme="purple"
+                    defaultValue={piece?.tags}
                   >
-                    {loadingTags ? "Saving..." : "Save changes"}
-                  </Button>
-                  <Button onClick={handleModalEditTagsClose}>Cancel</Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
+                    <Stack spacing={[1, 5]} direction={"column"}>
+                      {subjectValues.map((value: any) => (
+                        <Checkbox
+                          key={value}
+                          value={value}
+                          onChange={(e: any) => handleCbTagsOnChange(e, value)}
+                        >
+                          {value}
+                        </Checkbox>
+                      ))}
+                    </Stack>
+                  </CheckboxGroup>
+                </Box>
+              </FormControl>
 
+              <FormControl>
+                <FormLabel fontWeight={700} fontSize={"lg"}>
+                  Style
+                </FormLabel>
+                <Box overflowY={"scroll"} height={"150px"} pl={4}>
+                  <CheckboxGroup
+                    colorScheme="purple"
+                    defaultValue={piece?.tags}
+                  >
+                    <Stack spacing={[1, 5]} direction={"column"}>
+                      {styleValues.map((value: any) => (
+                        <Checkbox
+                          key={value}
+                          value={value}
+                          onChange={(e: any) => handleCbTagsOnChange(e, value)}
+                        >
+                          {value}
+                        </Checkbox>
+                      ))}
+                    </Stack>
+                  </CheckboxGroup>
+                </Box>
+              </FormControl>
+            </ModalBody>
 
+            <ModalFooter>
+              <Button colorScheme="purple" mr={3} onClick={updateTags}>
+                {loadingTags ? "Saving..." : "Save changes"}
+              </Button>
+              <Button onClick={handleModalEditTagsClose}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          isOpen={openModalEditAvailability}
+          onClose={handleModalEditAvailabilityClose}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Edit piece availability</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={2}>
+              <FormControl as={HStack}>
+                <FormLabel fontWeight={700} fontSize={"lg"}>
+                  Availability:
+                </FormLabel>
+                <Switch
+                  id="availability"
+                  ref={switchAvailabilityRef}
+                  isChecked={availability}
+                  onChange={() =>
+                    availability ? setAvailability(false) : setAvailability(true)
+                  }
+                  size="lg"
+                  colorScheme="purple"
+                />
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="purple" mr={3} onClick={updateAvailability}>
+                {loadingAvailability ? "Saving..." : "Save changes"}
+              </Button>
+              <Button onClick={handleModalEditAvailabilityClose}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <AlertDialog
+          isOpen={openAlertDialogDelete}
+          leastDestructiveRef={cancelDeleteRef}
+          onClose={handleAlertDialogDeleteClose}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Delete Post
+              </AlertDialogHeader>
+              <AlertDialogBody>
+                Are you sure? You can&apos;t undo this action afterwards.
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button
+                  ref={cancelDeleteRef}
+                  onClick={handleAlertDialogDeleteClose}
+                >
+                  Cancel
+                </Button>
+                <Button colorScheme="red" onClick={deletePost} ml={3}>
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </Center>
     </div>
   );

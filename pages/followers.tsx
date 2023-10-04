@@ -35,7 +35,7 @@ const Followers: NextPage = () => {
           ) : (
             <SimpleGrid columns={[1, 2, 3, 4]} spacing={5}>
               {profiles.map((profile: any) => (
-                <Box onClick={() => router.push(`/profile/${profile.id}`)} cursor={'pointer'}>
+                <Box key={profile.id} onClick={() => router.push(`/profile/${profile.id}`)} cursor={'pointer'}>
                   <UserExploreCard
                     key={profile.data().id}
                     id={profile.data().id}

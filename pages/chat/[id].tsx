@@ -53,7 +53,7 @@ export default function Chat() {
           <VStack>
             <Text>{msg.text}</Text>
             <Text fontSize={"xs"} textAlign={"right"}>
-              {moment(msg.timestamp.toDate()).fromNow()}
+              {/* {moment(msg.timestamp.toDate()).fromNow()} */}
             </Text>
           </VStack>
         </Flex>

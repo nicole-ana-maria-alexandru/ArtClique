@@ -99,10 +99,13 @@ function Searchbar() {
         <ModalContent>
           <ModalHeader pt={10}>
             <InputGroup>
-              <InputLeftElement
+              {/* <InputLeftElement
                 pointerEvents="none"
                 children={<SearchIcon />}
-              />
+              /> */}
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon />
+              </InputLeftElement>
               <Input
                 type="text"
                 placeholder="Search users by username"

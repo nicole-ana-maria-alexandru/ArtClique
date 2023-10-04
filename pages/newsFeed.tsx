@@ -122,25 +122,28 @@ const NewsFeed: NextPage = () => {
           </>
         )} */}
 
-      {!posts.length && (
+      {posts && !posts.length ? (
         <Center>
           <VStack>
-            <Text fontSize={'lg'} fontWeight={'semibold'}>Please follow other users to populate your news feed.</Text>
+            <Text fontSize={"lg"} fontWeight={"semibold"}>
+              Please follow other users to populate your news feed.
+            </Text>
             <Text>In order to do this, feel free to use the Explore page.</Text>
           </VStack>
         </Center>
+      ) : (
+        <InfiniteScroll
+          dataLength={displayPosts.length}
+          // scrollableTarget='scrollable-div'
+          next={addSlice}
+          scrollThreshold={0.8}
+          hasMore={hasMore}
+          loader={barloader(hasMore)}
+          // endMessage="That's it!"
+        >
+          <div>{displayPosts}</div>
+        </InfiniteScroll>
       )}
-      <InfiniteScroll
-        dataLength={displayPosts.length}
-        // scrollableTarget='scrollable-div'
-        next={addSlice}
-        scrollThreshold={0.8}
-        hasMore={hasMore}
-        loader={barloader(hasMore)}
-        // endMessage="That's it!"
-      >
-        <div>{displayPosts}</div>
-      </InfiniteScroll>
     </NavMenu>
   );
 };

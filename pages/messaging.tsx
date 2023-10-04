@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { NextPage } from "next";
-import { Box } from '@chakra-ui/react';
+import { Box, Image } from '@chakra-ui/react';
 import SidebarChat from "../components/chat/SidebarChat";
 
 

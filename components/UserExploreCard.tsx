@@ -13,6 +13,7 @@ import {
   Text,
   Link,
   Center,
+  Tooltip,
 } from "@chakra-ui/react";
 // import Link from "next/link";
 
@@ -42,6 +43,7 @@ function UserExploreCard({
   timestamp: Timestamp;
 }) {
   return (
+    <Tooltip label="Go to profile" bg="gray.300" color="black">
     <Box
       maxW={"320px"}
       w={"full"}
@@ -96,6 +98,7 @@ function UserExploreCard({
         </Stack>
       </Center>
     </Box>
+    </Tooltip>
   );
 }
 

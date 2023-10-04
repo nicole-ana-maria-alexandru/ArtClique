@@ -84,7 +84,7 @@ function PieceExploreCard({
             },
           }}
         >
-          <Tooltip label="Go to post" bg="gray.300" color="black">
+          <Tooltip label="Go to post" bg="gray.300" color="black" fontWeight={'bold'}>
             <Image
               rounded={"lg"}
               height={230}

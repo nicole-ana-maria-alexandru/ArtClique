@@ -114,6 +114,9 @@ function UserProfileCard() {
     //   await updateDoc(doc(db, "artists", artist.id), {
     //     description: descriptionRef.current?.value,
     //   });
+    let updatedDescription = "Welcome to my profile!";
+    if(descriptionRef.current?.value)
+      updatedDescription = descriptionRef.current?.value;
 
     const imageRef = ref(storage, `users/${userDetails.id}/profile_img`);
 
@@ -122,7 +125,7 @@ function UserProfileCard() {
         const downloadURL = await getDownloadURL(imageRef);
         await updateDoc(doc(db, "users", userDetails.id), {
           profile_img: downloadURL,
-          description: descriptionRef.current?.value,
+          description: updatedDescription,
         });
         
         // setUserDetails((oldDetails: UserDetails) => {
@@ -186,6 +189,7 @@ function UserProfileCard() {
 
   const uploadPost = async () => {
     if (loading) return;
+    // let postImageAddress;
 
     setLoading(true);
 
@@ -205,7 +209,7 @@ function UserProfileCard() {
         postId: docRef.id,
         title: titleRef.current?.value,
         price: priceRef.current?.value,
-        currency: currencyRef.current?.value,
+        currency: "EUR",
         year: yearRef.current?.value,
         artistName: artistNameRef.current?.value,
         ownerId: userDetails.id,
@@ -218,7 +222,7 @@ function UserProfileCard() {
         tags: [],
         timestamp: serverTimestamp(),
       });
-
+    }
 
     const imageRef = ref(storage, `posts/${docRef.id}/image`);
 
@@ -238,7 +242,6 @@ function UserProfileCard() {
         });
       }
     });
-    }
 
     setOpenModalAddPost(false);
     setLoading(false);
@@ -308,7 +311,6 @@ function UserProfileCard() {
                 direction={"row"}
                 mt={6}
               >
-                {/*TODO aici trebuie lucrat ca daca sunt mai multe ies chestiile in afara si ar trb sa fie pe 2 randuri sau mai multe */}
                 <Badge
                   px={2}
                   py={1}
@@ -391,10 +393,10 @@ function UserProfileCard() {
 
                 <ModalFooter>
                   <Button
-                    colorScheme="blue"
+                    colorScheme="purple"
                     mr={3}
                     disabled={!selectedFile}
-                    onClick={updateProfile}
+                    onClick={updateProfile} 
                   >
                     {loading ? "Saving..." : "Save changes"}
                   </Button>
@@ -409,7 +411,7 @@ function UserProfileCard() {
             >
               <ModalOverlay />
               <ModalContent>
-                <ModalHeader>Edit your profile's tags</ModalHeader>
+                <ModalHeader>Edit your profile&apos;s tags</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb={6}>
                   <FormControl pb={6}>
@@ -450,7 +452,7 @@ function UserProfileCard() {
 
                 <ModalFooter>
                   <Button
-                    colorScheme="blue"
+                    colorScheme="purple"
                     mr={3}
                     onClick={updateTags}
                   >
@@ -506,6 +508,9 @@ function UserProfileCard() {
                         forSale ? setForSale(false) : setForSale(true)
                       }
                       ref={checkboxRef}
+                      fontWeight="bold"
+                      p={2}
+                      colorScheme={'purple'}
                     >
                       Is it for sale?
                     </Checkbox>
@@ -529,6 +534,7 @@ function UserProfileCard() {
                           type={"number"}
                           ref={yearRef}
                           placeholder="Year"
+                          onWheel={(e: any) => e.target.blur()}
                         />
                       </FormControl>
 
@@ -554,6 +560,7 @@ function UserProfileCard() {
                           type={"number"}
                           ref={heightRef}
                           placeholder="Height"
+                          onWheel={(e: any) => e.target.blur()}
                         />
                       </FormControl>
 
@@ -563,6 +570,7 @@ function UserProfileCard() {
                           type={"number"}
                           ref={widthRef}
                           placeholder="Width"
+                          onWheel={(e: any) => e.target.blur()}
                         />
                       </FormControl>
 
@@ -572,6 +580,7 @@ function UserProfileCard() {
                           type={"number"}
                           ref={depthRef}
                           placeholder="Depth"
+                          onWheel={(e: any) => e.target.blur()}
                         />
                       </FormControl>
 
@@ -594,10 +603,11 @@ function UserProfileCard() {
                           type={"number"}
                           ref={priceRef}
                           placeholder="Price"
+                          onWheel={(e: any) => e.target.blur()}
                         />
                       </FormControl>
 
-                      <FormControl>
+                      {/* <FormControl>
                         <FormLabel htmlFor="currency">Currency</FormLabel>
                         <Select
                           id="currency"
@@ -608,14 +618,14 @@ function UserProfileCard() {
                           <option>EUR</option>
                           <option>USD</option>
                         </Select>
-                      </FormControl>
+                      </FormControl> */}
                     </>
                   )}
                 </ModalBody>
 
                 <ModalFooter>
                   <Button
-                    colorScheme="blue"
+                    colorScheme="purple"
                     mr={3}
                     disabled={!selectedFileAddPost}
                     onClick={uploadPost}

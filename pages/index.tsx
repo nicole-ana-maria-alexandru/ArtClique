@@ -12,11 +12,23 @@ import {
   Button,
   Icon,
   IconProps,
+  Box,
 } from "@chakra-ui/react";
-import UserProfileCard from "../components/UserProfileCard";
-import NavMenu from "../components/NavMenu";
+import { useAuth } from "../hooks/AuthContext";
+import { useState } from "react";
+import { VStack } from "@chakra-ui/react";
 
 const Home: NextPage = () => {
+  const { user, logout } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onLogOut = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
+    await logout();
+    setIsLoading(false);
+  };
+
   return (
     <div className="padding: 0px">
       <Head>
@@ -25,28 +37,44 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
         <script src="https://js.stripe.com/v3/"></script>
       </Head>
-
-      {/* <UserProfileCard /> */}
+              {/* @ts-ignore */}
+      {/* <video autoplay muted loop id="myVideo">
+  <source src="../components/assets/landingbg.mp4" type="video/mp4"></source>
+</video> */}
+{/* <Box
+      as='video'
+      autoPlay
+      src={"../components/assets/landingbg.mp4"}
+      objectFit='contain'
+      sx={{
+        aspectRatio: '16/9'
+      }}
+  /> */}
       <Container
         maxW="100%"
-        h="calc(100vh)"
+        minH="calc(100vh)"
         bgGradient="linear(to-b, #181820, #0b0b0f)"
+        // bg={"#181820"}
+        // bgGradient="linear(to-b, #0b0b0f, #181820)"
       >
+
+
         <Navbar />
         <Container maxW={"5xl"}>
           <Stack
             textAlign={"center"}
             align={"center"}
-            spacing={{ base: 8, md: 10 }}
-            py={{ base: 20, md: 24 }}
+            spacing={4}
+            py={{ base: 8, md: 10 }}
           >
             <Heading
               fontWeight={600}
               fontSize={{ base: "3xl", sm: "4xl", md: "6xl" }}
               lineHeight={"110%"}
               color="white"
+              fontFamily={"body"}
             >
-              Welcome to {" "}
+              Welcome to{" "}
               <Text
                 as={"span"}
                 bgGradient="linear(to-r, blue.500, purple.500)"
@@ -55,40 +83,96 @@ const Home: NextPage = () => {
                 The Art Clique
               </Text>
             </Heading>
-            <Text color={"gray.500"} maxW={"3xl"}>
-              Never miss a meeting. Never be late for one too. Keep track of
-              your meetings and receive smart reminders in appropriate times.
-              Read your smart “Daily Agenda” every morning.
+            <Text
+              color={"white"}
+              maxW={"3xl"}
+              fontWeight={"extrabold"}
+              fontSize={"lg"}
+            >
+              The all-in-one solution for the art community.
             </Text>
-            <Stack spacing={6} direction={"row"}>
-              <Button
-                as={"a"}
-                width={"60%"}
-                href={"register"}
-                rounded={"full"}
-                px={6}
-                bgGradient="linear(to-r, blue.500, purple.500)"
-                color={"white"}
-                _hover={{
-                  bgGradient: "linear(to-r, blue.400, purple.400)",
-                  shadow: "white_btn",
-                }}
-              >
-                Register Now
-              </Button>
-              <Button
-                as={"a"}
-                href={"login"}
-                width={"50%"}
-                rounded={"full"}
-                px={6}
-                _hover={{
-                  shadow: "white_btn",
-                }}
-              >
-                Log In
-              </Button>
-            </Stack>
+            <Text color={"gray.300"} maxW={"3xl"}>
+              The Art Clique is a social media designed to satisfy the needs of
+              the art community such as networking and self-promotion. In
+              addition, you can also buy and sell art without having to use a
+              third party.
+            </Text>
+            {user ? (
+              <VStack>
+                <Stack spacing={6} direction={"row"}>
+                  <Button
+                    as={"a"}
+                    width={"60%"}
+                    href={"newsFeed"}
+                    rounded={"full"}
+                    px={6}
+                    bgGradient="linear(to-r, blue.500, purple.500)"
+                    color={"white"}
+                    _hover={{
+                      bgGradient: "linear(to-r, blue.400, purple.400)",
+                      shadow: "white_btn",
+                    }}
+                  >
+                    Open App
+                  </Button>
+                  <Button
+                    as={"a"}
+                    href={"login"}
+                    width={"50%"}
+                    rounded={"full"}
+                    px={6}
+                    _hover={{
+                      shadow: "white_btn",
+                    }}
+                    isLoading={isLoading}
+                    onClick={onLogOut}
+                  >
+                    Log Out
+                  </Button>
+                </Stack>
+                <Text color={"gray.500"} fontWeight={"semibold"}>
+                  You are logged in
+                </Text>
+              </VStack>
+            ) : (
+              <Stack spacing={6} direction={"row"}>
+                <Button
+                  as={"a"}
+                  width={"60%"}
+                  href={"register"}
+                  rounded={"full"}
+                  px={6}
+                  bgGradient="linear(to-r, blue.500, purple.500)"
+                  color={"white"}
+                  _hover={{
+                    bgGradient: "linear(to-r, blue.400, purple.400)",
+                    shadow: "white_btn",
+                  }}
+                >
+                  Register Now
+                </Button>
+                <Button
+                  as={"a"}
+                  href={"login"}
+                  width={"50%"}
+                  rounded={"full"}
+                  px={6}
+                  _hover={{
+                    shadow: "white_btn",
+                  }}
+                >
+                  Log In
+                </Button>
+              </Stack>
+            )}
+
+            <Image
+              src={require("../components/assets/landing3.png")}
+              alt="landingpage"
+              objectFit="contain"
+              height={1500}
+            />
+
             <Flex w={"full"}>
               {/* <Illustration
             height={{ sm: '24rem', lg: '28rem' }}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Flex,
   Heading,
@@ -7,6 +7,20 @@ import {
   Text,
   Spacer,
   Divider,
+  Box,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
+  HStack,
+  MenuButton,
+  IconButton,
+  Menu,
+  MenuItem,
+  MenuList,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import {
@@ -18,6 +32,8 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../hooks/firebase/firebase";
+import { FiMoreVertical } from "react-icons/fi";
+import { AddIcon } from "@chakra-ui/icons";
 
 function RecipientsCard({ userId }: { userId: any }) {
   const [firstName, setFirstName] = useState("");
@@ -41,15 +57,20 @@ function RecipientsCard({ userId }: { userId: any }) {
 
   return (
     <div>
+      <HStack>
       <Flex h="81px" w="100%" align="center" p={5} cursor={"pointer"}>
         <Avatar src={profileImage} marginEnd={3} />
         <Stack>
-          <Heading size="sm">
-            {firstName} {lastName}
-          </Heading>
+          <HStack>
+            <Heading size="sm">
+              {firstName} {lastName}
+            </Heading>
+            
+          </HStack>
           <Text size="md">@{username}</Text>
         </Stack>
       </Flex>
+      </HStack>
       <Divider />
     </div>
   );
